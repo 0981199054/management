@@ -1,0 +1,51 @@
+<template>
+    
+    <div>
+         <input id="staerInput" placeholder="输入相关规格" type="text"><el-button style="marginLeft:5px" type="primary" plain @click="standard">确定</el-button>
+         <ul id="standUl" v-for="(obj,index) in standText" :key="index">
+             <li><span style="color:#2a27278f">{{index+1}}:</span>({{obj}})</li>
+         </ul>
+    </div>
+</template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      standText: []
+    };
+  },
+
+  methods: {
+    standard() {
+      if (staerInput.value === "") {
+        this.$message({
+          message: "注意！，内容不能为空",
+          type: "warning"
+        });
+      } else {
+        this.standText.push(staerInput.value);
+        staerInput.value = "";
+        this.$emit("Standard",this.standText)
+      }
+    }
+  }
+};
+</script>
+
+<style scoped>
+#standUl{
+    list-style: none;
+}
+#standUl li{
+  font-size: 12px;
+  color: gray;
+}
+#staerInput{
+      width: 300px;
+  height: 40px;
+  outline: none;
+  border: 1px solid gray;
+}
+</style>

@@ -1,0 +1,245 @@
+<template>
+  <div class="parentDiv">
+    <!-- 搜索框 -->
+    <div class="input_div">
+    <input class="Top_input" placeholder=">> 请输入商户信息">
+    <el-button type="success">提交</el-button>
+    <el-button type="info">重置</el-button>
+    </div>
+<!-- 内容 -->
+
+    <div class="contentDiv">
+
+      <div> <label>规格：</label> <input id="specification" name="specification" class="content_input" placeholder="请输入内容">
+        <div>
+            <el-checkbox :indeterminate="isspecification" v-model="specikAll" @change="spaceCheckAllChange">全选</el-checkbox>
+            <div style="margin: 15px 0;"></div>
+            <el-checkbox-group v-model="checkedSpace" @change="handleCheckedCitiesChange">
+            <el-checkbox v-for="specification in Spacearr" :label="specification" :key="specification">{{specification}}</el-checkbox>
+            </el-checkbox-group>
+        </div>
+      </div>
+
+
+      <div> <label>店铺名称：</label> <input id="store_name" name="store_name" class="content_input" placeholder="请输入内容"></div>      
+      <div> <label>商品名称：</label> <input id="commodity_name" name="commodity_name" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>商品图片：</label> <input  class="content_input" placeholder="请输入内容"></div>
+
+
+
+<el-upload
+  action="http://192.168.43.13:4444/taobaotupianImg/"
+  list-type="picture-card"
+  :on-preview="handlePictureCardPreview"
+  :on-remove="handleRemove">
+  <i class="el-icon-plus"></i>
+</el-upload>
+<el-dialog :visible.sync="dialogVisible">
+  <img width="100%" :src="dialogImageUrl" alt="">
+</el-dialog>
+
+
+
+
+
+      <div> <label>价格：</label> <input id="price" name="price" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>促销价格：</label> <input id="promotion" name="promotion" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>销量</label> <input id="sales" name="sales" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>商品上市时间：</label> <input id="market" name="market" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>快递：</label> <input id="expressage" name="expressage" class="content_input" placeholder="请输入内容"></div>
+
+
+      <div> <label>服务：</label><br>
+          <el-checkbox :indeterminate="issever" v-model="severAll" @change="severCheckAllChange">全选</el-checkbox>
+          <div style="margin: 15px 0;"></div>
+          <el-checkbox-group v-model="checkedsever" @change="handleCheckedseverChange">
+          <el-checkbox v-for="serve in severarr" :label="serve" :key="serve">{{ serve}}</el-checkbox>
+          </el-checkbox-group>
+      </div>
+
+
+      <div> <label>库存：</label> <input id="stock" name="stock" class="content_input" placeholder="请输入内容"></div>
+
+      
+      <div> <label>产品参数：</label> <input id="parameter" name="parameter" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>评分:</label> <input id="grade" name="grade" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>详情：</label> <input id="details" name="details" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>地理位置：  </label> <input id="city" name="city" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="serve" name="serve" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="" class="content_input" placeholder="请输入内容"></div>
+      <div> <label>服务：</label> <input id="" class="content_input" placeholder="请输入内容"></div>
+
+      <button @click="clickbtn">点我</button>
+      <button @click="clickBUtton">多选测试</button>
+
+      <parameters />
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+// 引入组件
+import parameters from "./Parameter";
+
+// 服务
+const severOptions = [
+  "8天退货退货条件：在商品签收8天内，商品包装完好、吊牌齐全、未洗涤，可提出退货申请。邮费说明：包邮商品发货邮费卖家承担；非包邮商品发货邮费卖家承担；退货邮费买家承担。",
+  "消费者保障服务该卖家已缴纳 1211.0 元保证金。在确认收货 15 天内，如有商品质量问题、描述不符或未收到货等，您有权申请退款或退货，来回邮费由卖家承担。",
+  "退货条件：在商品签收15天内，商品包装完好、吊牌齐全、未洗涤，可提出退货申请。邮费说明：包邮商品发货邮费卖家承担；非包邮商品发货邮费卖家承担；退货邮费卖家承担。",
+  "保证2个工作日之内发货"
+];
+// 规格
+const cityOptions = [
+  "S【胸围80腰68】",
+  "M【胸围84腰72】",
+  "L【胸围88腰76】",
+  "XL【胸围94腰82】"
+];
+export default {
+  data() {
+    return {
+      dialogImageUrl: "",
+      dialogVisible: false,
+      ip: "http://192.168.43.13:4444",
+      // 多选
+      severAll: false,
+      checkedsever: [],
+      severarr: severOptions,
+      issever: true,
+      // 规格
+      specikAll: false,
+      checkedSpace: [],
+      Spacearr: cityOptions,
+      isspecification: true
+    };
+  },
+  components: {
+    parameters
+  },
+  methods: {
+    clickBUtton() {
+      console.log(parameters);
+    },
+    clickbtn() {
+      let param = {
+        store_name: store_name.value,
+        commodity_name: commodity_name.value,
+        price: price.value,
+        promotion: promotion.value,
+        sales: sales.value,
+        market: market.value,
+        expressage: expressage.value,
+        serve: this.checkedsever,
+        stock: stock.value,
+        specification: this.checkedSpace,
+        parameter: parameter.value,
+        grade: grade.value,
+
+        details: details.value,
+
+        city: city.value
+      };
+
+      if (
+        store_name.value != "" &&
+        commodity_name.value != "" &&
+        price.value != ""
+      ) {
+        axios.get(this.ip + "/addcommdotiy", { params: param }).then(msg => {
+          this.$notify({
+            title: "成功",
+            message: "添加成功",
+            type: "success"
+          });
+        });
+      } else {
+        this.$alert("请先添加内容", "系统提示", {
+          confirmButtonText: "确定",
+          callback: action => {
+            this.$message({
+              type: "info",
+              message: `action: ${action}`
+            });
+          }
+        });
+      }
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    // 多选
+    severCheckAllChange(val) {
+      this.checkedsever = val ? severOptions : [];
+      this.issever = false;
+    },
+    handleCheckedseverChange(value) {
+      let checkedCount = value.length;
+      this.severAll = checkedCount === this.severarr.length;
+      this.issever = checkedCount > 0 && checkedCount < this.severarr.length;
+    },
+
+    // 规格
+    spaceCheckAllChange(val) {
+      this.checkedSpace = val ? cityOptions : [];
+      this.isspecification = false;
+    },
+    handleCheckedCitiesChange(value) {
+      let checkedCount = value.length;
+      this.specikAll = checkedCount === this.Spacearr.length;
+      this.isspecification =
+        checkedCount > 0 && checkedCount < this.Spacearr.length;
+    }
+  }
+};
+</script>
+<style scoped>
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.parentDiv[data-v-32188b8c] {
+  height: 100%;
+  padding: 0 30px 30px 30px;
+  margin-top: 0px;
+}
+.parentDiv {
+  height: 100%;
+  padding: 0 30px 30px 30px;
+}
+.input_div {
+  width: 100%;
+  height: 50px;
+  border-bottom: 3px solid rgb(20, 85, 3);
+}
+.Top_input {
+  padding-right: 30px;
+  height: 90%;
+  width: 80%;
+  border: none;
+  outline: none;
+}
+.contentDiv {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+.contentDiv div {
+  width: 30%;
+  margin-top: 20px;
+}
+.content_input {
+  height: 30px;
+  outline: none;
+}
+</style>

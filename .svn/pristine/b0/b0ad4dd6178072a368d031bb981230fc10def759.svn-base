@@ -1,0 +1,169 @@
+<template>
+<div class="content">
+   <img :src="IP" alt="">
+  <div id="login">  
+    <!-- <img :src="IP2" alt="" class="tianmao"> -->
+        <p>欢迎进入淘宝后台注册</p>       
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="账号" prop="name">
+          <el-input type="text" v-model="ruleForm.name"></el-input>
+          </el-form-item>
+        <el-form-item label="昵称" prop="nickname">
+          <el-input type="text" v-model="ruleForm.nickname"></el-input>
+        </el-form-item>
+         <el-form-item label="密码" prop="pwd">
+          <el-input type="password" v-model="ruleForm.pwd" ></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPass">
+          <el-input type="password" v-model="ruleForm.checkPass" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')" class="btn">注册</el-button>
+          <router-link to='/log'>已有账号？点击登录</router-link>
+        </el-form-item>
+      </el-form>
+      <el-alert  title="" type="warning" @close="hello"> </el-alert>
+    </div>
+    </div>
+</template>
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    var validateName = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error(" "));
+      } else if (value !== this.ruleForm.name) {
+        callback(new Error(" "));
+      } else {
+        callback();
+      }
+    };
+    var validateNickname = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error(" "));
+      } else if (value !== this.ruleForm.nickname) {
+        callback(new Error(" "));
+      } else {
+        callback();
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error(" "));
+      } else {
+        if (this.ruleForm.checkPass !== "") {
+          this.$refs.ruleForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error(" "));
+      } else if (value !== this.ruleForm.pwd) {
+        callback(new Error(" "));
+      } else {
+        callback();
+      }
+    };
+    return {
+      ip: "http://127.0.0.1:7888",
+      ruleForm: {
+        name: "",
+        nickname: "",
+        pwd: "",
+        checkPass: ""
+      },
+      rules: {
+        name: [{ validator: validateName, trigger: "blur" }],
+        nickname: [{ validator: validateNickname, trigger: "blur" }],
+        pwd: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }]
+      },
+      IP: "http://192.168.43.34:7888/images/timg6.jpg"
+      // IP: "http://10.0.40.240:7888/images/timg6.jpg"
+      // IP2: "http://192.168.43.34:7888/images/tianmao1.jpg"
+    };
+  },
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.btn();
+        } else {
+          // alert("请填写所有内容!!");
+          this.hello();
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    },
+    hello() {
+      this.$message.error("请填写所有内容!!");
+    },
+    btn() {
+      let param = {
+        name: this.ruleForm.name,
+        nickname: this.ruleForm.nickname,
+        pwd: this.ruleForm.pwd,
+        checkPass: this.ruleForm.checkPass
+      };
+      axios.post(this.ip + "/reg", param).then(msg => {
+        this.$router.push("/log");
+      });
+    }
+  }
+};
+</script>
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+}
+/* 背景图 */
+.content img {
+  width: 100%;
+  height: 700px;
+  position: relative;
+}
+/* 小图 */
+/* #login img {
+  width: 455px;
+  height: 40px;
+} */
+/* 登录页面 */
+#login {
+  position: absolute;
+  background: whitesmoke;
+  top: 25%;
+  left: 36%;
+  border: 1px solid #e5e5e5;
+  height: 345px;
+  width: 455px;
+  opacity: 0.9;
+}
+p {
+  margin: 25px 0;
+  text-align: center;
+  color: #ff9000;
+  font-size: 18px;
+}
+.el-input {
+  width: 290px;
+  height: 50px;
+}
+.demo-ruleForm1 {
+  margin-left: 95px;
+}
+/* 登录按钮 */
+.btn {
+  width: 100px;
+  height: 40px;
+  background: #ff9000;
+  border: 1px solid #ff9000;
+}
+</style>

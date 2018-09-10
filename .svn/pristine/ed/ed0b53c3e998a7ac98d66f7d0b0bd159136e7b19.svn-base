@@ -1,0 +1,37 @@
+<template>
+
+    <div>
+            <el-button @click="btnCeshi">获取上架时间</el-button>
+            <p class="ptext">{{dateText}}</p>
+    </div>
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+  data () {
+    return {
+      dateText: ''
+    }
+  },
+
+  methods: {
+    btnCeshi () {
+      var date = new Date()
+      var year = date.getFullYear()
+      var month = date.getMonth() + 1
+      var day = date.getDate()
+      this.dateText = year + '-' + month + '-' + day
+      this.$emit('GetTime', this.dateText)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.ptext{
+  color: gray;
+  font-size: 12px;
+  margin-left: 20px;
+}
+</style>

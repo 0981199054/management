@@ -1,0 +1,45 @@
+<template>
+
+    <div>
+  <el-upload
+    class="upload-demo"
+    :action="ips"
+    :limit="6"
+    name="inputFile"
+    :on-success = "fileSuccess"
+    multiple
+    >
+    <el-button size="small" type="primary">点击上传图片</el-button>
+    <span style="marginLeft:10px" slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb(注意上传之后不可修改)</span>
+  </el-upload>
+    </div>
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+  data () {
+    return {
+      ips: 'http://127.0.0.1:3333/commod/uploader',
+      imageUrl: '',
+      imgarr: []
+    }
+  },
+
+  methods: {
+    fileSuccess (response, file, fileList) {
+    
+      this.inputFile = response
+      this.imgarr.push(response.split('\\')[2])
+      this.$emit('uploadImgarr', this.imgarr)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.el-button--primary {
+  background-color: #ff5777;
+  border-color: #ff5777;
+}
+</style>

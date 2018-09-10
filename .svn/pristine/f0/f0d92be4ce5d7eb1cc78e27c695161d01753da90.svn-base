@@ -1,0 +1,17 @@
+<template>
+    <div>
+        <h1>店铺信息</h1>
+    </div>
+</template>
+
+<script>
+export default {
+  name: 'Information'
+}
+</script>
+
+<style scoped>
+* {
+  padding: 0;
+}
+</style>

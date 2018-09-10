@@ -1,0 +1,37 @@
+<template>
+  <div>
+    <el-tabs @tab-click="handleClick">
+      <el-tab-pane class="tab" label="商家管理" value='information' name="first"></el-tab-pane>
+      <el-tab-pane class="tab" label="店铺申请" value='nopass' name="second"></el-tab-pane>
+      <el-tab-pane class="tab" label="消息推送" value='news' name="third"></el-tab-pane>
+    </el-tabs>
+    <router-view />
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Permission',
+  data () {
+    return {
+    }
+  },
+  methods: {
+    handleClick (tab, event) {
+      this.$router.push(`/${tab.$attrs.value}`)
+    }
+  },
+  components: {},
+  computed: {
+
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-tabs__item {
+  font-size: 16px;
+}
+
+</style>

@@ -1,0 +1,56 @@
+// import axios from 'axios'
+// const IP = 'http://192.168.43.34:7888' // 路由提出来写,方便维护
+// export default {
+//   state: {
+//     list: []
+//   },
+//   mutations: {
+//     changeList(state, data) {
+//       state.list = data
+//     }
+//   },
+//   actions: {
+//     increment(context) {
+//       axios.post('http://192.168.43.34:7888/login', {}).then(msg => {
+//         context.commit('changeList', msg.data)
+//       })
+//     }
+//   }
+// }
+export default {
+  state: {
+    list: {}
+  },
+  mutations: {
+    changeList: (state, params) => state.list = params
+  }
+}
+// // const IP = 'http://10.0.40.240:7888' 
+// let login = {
+//   state: {
+//     list: []
+//   },
+
+//   changeList(state, data) {
+//     state.list = data
+//   },
+//   actions: {
+//     increment(context) {
+//       // let param = {
+//       //   name,
+//       //   pwd,
+//       //   checkPass,
+//       //   head_portrait,
+//       //   nickname,
+//       //   islogin,
+//       //   merchant
+//       // }
+
+//       axios.post( 'http://192.168.43.34:7888/login', {}).then(msg => {
+//         context.commit('changeList', msg.data)
+//         // return msg.data
+//       })
+//     }
+//   }
+// }
+// export default login;

@@ -1,0 +1,140 @@
+<template>
+<div class="content">
+   <img :src="IP" alt="">
+  <div id="login">  
+        <p>欢迎进入淘宝后台注册</p>       
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="账号" prop="name">
+          <el-input v-model="ruleForm2.name"></el-input>
+          </el-form-item>
+         <el-form-item label="密码" prop="pwd">
+          <el-input type="password" v-model="ruleForm2.pwd" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPass">
+          <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="nickname">
+          <el-input v-model="ruleForm2.nickname"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm2')" class="BTN">注册</el-button>
+          <router-link to='/log'>已有账号？点击登录</router-link>
+        </el-form-item>
+      </el-form>
+    </div>
+    </div>
+</template>
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    var checkName = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("账号不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var nickname = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("昵称不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.ruleForm2.pwd !== "") {
+          this.$refs.ruleForm2.validateField("pwd");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.ruleForm2.pass) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
+    return {
+      ruleForm2: {
+        pwd: "",
+        checkPass: "",
+        name: "",
+        nickname: ""
+      },
+      rules2: {
+        pwd: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
+        name: [{ validator: checkName, trigger: "blur" }],
+        nickname: [{ validator: nickname, trigger: "blur" }]
+      },
+       IP:'http://192.168.43.34:7888/images/timg6.jpg'
+    };
+  },
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          alert("submit!");
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    }
+  }
+};
+</script>
+
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+}
+.content img {
+  width: 100%;
+  height: 700px;
+  position: relative;
+}
+#login {
+  position: absolute;
+  background: whitesmoke;
+  top: 25%;
+  left: 36%;
+  border: 1px solid #e5e5e5;
+  height: 340px;
+  width: 450px;
+  opacity: 0.9;
+}
+p {
+  margin: 25px 0;
+  text-align: center;
+  color: #ff9000;
+  font-size: 18px;
+}
+.el-input {
+  width: 290px;
+  height: 50px;
+  margin-bottom: 20px;
+}
+.demo-ruleForm1 {
+  margin-left: 95px;
+}
+/* 登录按钮 */
+.BTN {
+  width: 100px;
+  height: 40px;
+  background: #ff9000;
+  border: 1px solid #ff9000;
+}
+</style>

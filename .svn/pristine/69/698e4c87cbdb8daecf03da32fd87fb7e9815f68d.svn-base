@@ -1,0 +1,71 @@
+<template>
+  <div class="all">
+    店铺名称:
+    <el-input style="width:400px;   margin-bottom: 20px;" v-model="name" placeholder="请输入店铺名称"></el-input><br> 店铺地址:
+    <el-input style="width:400px;  margin-bottom: 20px;" v-model="site" placeholder="请输入店铺地址"></el-input><br> 店铺类型:
+    <el-input style="width:400px;  margin-bottom: 20px;" v-model="type" placeholder="请输入店铺类型"></el-input><br> 店铺电话:
+    <el-input style="width:400px" v-model="phone" placeholder="请输入店铺电话"></el-input><br>
+    <el-button style="margin-top:20px;margin-left:200px;" type="primary" @click="fromBtn">提交</el-button>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+  data () {
+    return {
+      IP: 'http://127.0.0.1:3333/taobao',
+      name: '',
+      site: '',
+      type: '',
+      phone: ''
+    }
+  },
+  methods: {
+    fromBtn () {
+      if (
+        this.name !== '' &&
+        this.site !== '' &&
+        this.type !== '' &&
+        this.phone !== ''
+      ) {
+        this.$message({
+          message: '提交成功！',
+          type: 'success'
+        })
+        axios
+          .post(this.IP + '/shopapply', {
+            name: this.name,
+            site: this.site,
+            isApply: 'no',
+            commodity: [],
+            indent: [],
+            LV: '',
+            type: this.type,
+            phone: this.phone,
+            id: this.$store.state.login.list._id
+          })
+          .then(msg => {})
+        this.name = ''
+        this.site = ''
+        this.type = ''
+        this.phone = ''
+      } else {
+        this.$message({
+          message: '警告,申请内容不能为空',
+          type: 'error'
+        })
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.all {
+  width: 470px;
+  height: 300px;
+  margin: auto;
+  margin-top: 150px;
+}
+</style>

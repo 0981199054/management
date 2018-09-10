@@ -1,0 +1,88 @@
+<template>
+  <div>
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="用户管理" value='information' name="first"></el-tab-pane>
+      <el-tab-pane label="配置管理" value='news' name="second"></el-tab-pane>
+      <el-tab-pane label="角色管理" value='nopass' name="third"></el-tab-pane>
+    </el-tabs>
+    <!-- <div>
+      <div @click='goInformation'>店铺信息</div>
+      <div @click='goNopass'>店铺申请</div>
+      <div @click='goNews'>消息推送</div>
+    </div> -->
+    <router-view />
+  </div>
+</template>
+
+<script>
+// let ip = 'http://192.168.43.136:3333/images/'
+export default {
+  name: 'Permission',
+  data () {
+    return {
+      mark: 0,
+      timer: null,
+      imgMain: '../static/imgarr/main.jpg',
+      imgArray: [
+        '../static/imgarr/1.jpg',
+        '../static/imgarr/2.jpg',
+        '../static/imgarr/3.jpg'
+      ]
+    }
+  },
+  methods: {
+    handleClick (tab, event) {
+      this.$router.push(`/${tab.$attrs.value}`)
+    }
+  },
+  components: {},
+  computed: {
+    // logImg () {
+    //   return ip + this.$store.state.JDShop.userImg
+    // },
+    // islog () {
+    //   return this.$store.state.JDShop.islog
+    // }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+* {
+  list-style: none;
+}
+.height {
+  width: 600px;
+  margin: auto;
+  height: 600px;
+  overflow: auto;
+}
+.img {
+  width: 590px;
+}
+.ul {
+  padding: 0;
+  margin: 0;
+  width: 600px;
+  height: 292px;
+  overflow: hidden;
+}
+.flex1 {
+  display: flex;
+  height: 40px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+.smallimg {
+  width: 30px;
+  height: 30px;
+}
+.flex {
+  display: flex;
+  width: 600px;
+  margin: auto;
+  align-items: center;
+}
+</style>

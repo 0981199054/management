@@ -1,0 +1,40 @@
+import axios from 'axios'
+
+const IP = 'http://127.0.0.1:3333' // 路由提出来写,方便维护
+let module1 = {
+  state: {
+    name: '张三',
+    age: 20,
+    arr: [
+      { name: '1', age: 17 },
+      { name: '2', age: 18 },
+      { name: '3', age: 23 }
+    ],
+    list: []
+  },
+  // 改变状态唯一途径
+  mutations: {
+    changeName (state, name) {
+      state.name = name
+    },
+    addAge (state) {
+      state.age++
+    },
+    changeList (state, data) {
+      state.list = data
+    }
+  },
+  // 计算衍生属性 性能优化 state.arr不发生变化，调用store.getters.getAul时便会调用缓存，不会重复计算
+  getters: {
+    getAul: state => state.arr.filter(item => item.age >= 18)
+  },
+  actions: {
+    increment (context) {
+      axios.post(IP + '/reg', {}).then(msg => {
+        context.commit('changeList', msg.data)
+      })
+    }
+  }
+}
+
+export default module1

@@ -1,0 +1,105 @@
+<template>
+<div class="content">
+  <!-- 背景图 -->
+   <img :src="IP" alt="">
+   <!-- 登录 -->
+  <div id="login">  
+        <p>欢迎进入淘宝后台登录</p>
+         <el-form status-icon label-width="75px" class="demo-ruleForm">
+            <el-form-item label="账号:"  prop="loginList.name">
+                <el-input type="text" v-model="loginList.name" auto-complete="off"></el-input>
+            </el-form-item>
+                <el-form-item label="密码:" prop="loginList.pass">
+                <el-input type="password" v-model="loginList.pwd" auto-complete="off"></el-input>
+            </el-form-item>         
+                <!-- <el-form-item label="验证码:" prop="code">
+                <el-input type="text" v-model="code" auto-complete="off"></el-input>
+            </el-form-item> -->
+            <div class="demo-ruleForm1">
+                <el-button type="primary" @click="loginBtn" class="BTN">登录</el-button>
+                 <router-link to='/reg'>没有账号？点击注册</router-link>
+            </div>           
+        </el-form>
+    </div>
+    </div>
+</template>
+<script>
+//引用axios
+import axios from "axios";
+export default {
+  data() {
+    return {
+      loginList: {
+        input: "",
+        name: "",
+        pwd: ""
+      },
+      isok: "ok",
+      IP:'http://192.168.43.34:7888/images/timg4.jpg'
+    };
+  },
+  methods: {
+    loginBtn() {
+      // console.log(data.isok);
+      // 点击登录界面发送的axios
+      let param = {
+        name: this.loginList.name,
+        pwd: this.loginList.pwd,
+        isok:this.isok
+      };
+      console.log(param);
+      axios.post("http://localhost:7888/login", {}).then(msg => {
+        if (msg.data == "t" && this.isok == "ok") {
+          console.log("msg");
+          this.$router.push("/main");
+        }
+        // console.log(msg);
+      });
+    }
+  }
+};
+</script>
+
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+}
+/* 背景图 */
+.content img {
+  width: 100%;
+  height: 700px;
+  position: relative;
+}
+/* 登录界面 */
+#login {
+  position: absolute;
+  background: whitesmoke;
+  top: 25%;
+  left: 36%;
+  border: 1px solid #e5e5e5;
+  height: 280px;
+  width: 430px;
+  opacity: 0.8;
+}
+p {
+  margin: 25px 0;
+  text-align: center;
+  color: #ff9000;
+  font-size: 18px;
+}
+.el-input {
+  width: 290px;
+  height: 50px;
+}
+.demo-ruleForm1 {
+  margin-left: 95px;
+}
+/* 登录按钮 */
+.BTN {
+  width: 100px;
+  height: 40px;
+  background: #ff9000;
+  border: 1px solid #ff9000;
+}
+</style>

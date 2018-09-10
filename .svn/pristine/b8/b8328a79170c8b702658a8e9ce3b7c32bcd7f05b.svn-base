@@ -1,0 +1,37 @@
+<template>
+  <div class="all">
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="商品管理" value='Commodity' name="first"></el-tab-pane>
+      <el-tab-pane label="店铺管理" value='Shop' name="second"></el-tab-pane>
+      <el-tab-pane label="订单管理" value='Order' name="third"></el-tab-pane>
+      <el-tab-pane label="推送管理" value='Push' name="four"></el-tab-pane>
+      <el-tab-pane label="店铺申请" value='Shopapply' name="five"></el-tab-pane>
+    </el-tabs>
+    <div class="two_div">
+        <router-view/>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Store",
+  data() {
+    return {
+      activeName: "first"
+    };
+  },
+  methods: {
+    handleClick(tab, event) {
+      this.$router.push(`/${tab.$attrs.value}`);
+    }
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-tabs__item {
+  font-size: 16px;
+}
+</style>

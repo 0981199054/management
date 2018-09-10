@@ -1,0 +1,189 @@
+<template>
+
+  <div class="courierdiv">
+
+    <div class="block">
+      <el-cascader expand-trigger="hover" :options="options" v-model="selectedOptions2" @change="handleChange">
+      </el-cascader>
+    </div>
+
+  </div>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      options: [
+        {
+          value: '四川省',
+          label: '四川省',
+          children: [
+            {
+              value: '成都市',
+              label: '成都市'
+            },
+            {
+              value: '达州市',
+              label: '达州市'
+            },
+
+            {
+              value: '南充市',
+              label: '南充市'
+            },
+
+            {
+              value: '攀枝花市',
+              label: '攀枝花市'
+            },
+
+            {
+              value: '乐山市',
+              label: '乐山市'
+            },,
+
+            {
+              value: '自贡市',
+              label: '自贡市'
+            },
+            {
+              value: '泸州市',
+              label: '泸州市'
+            },
+            {
+              value: '内江市',
+              label: '内江市'
+            },
+            {
+              value: '遂宁市',
+              label: '遂宁市'
+            },
+            {
+              value: '阿坝藏族羌族自治州',
+              label: '阿坝藏族羌族自治州'
+            }
+          ]
+        },
+        {
+          value: '广东省',
+          label: '广东省',
+          children: [
+            {
+              value: '韶关市',
+              label: '韶关市'
+            },
+            {
+              value: '深圳市',
+              label: '深圳市'
+            },
+            {
+              value: '珠海市',
+              label: '珠海市'
+            },
+
+            {
+              value: '汕头市',
+              label: '汕头市'
+            },,
+
+            {
+              value: '佛山市',
+              label: '佛山市'
+            },
+
+            {
+              value: '江门市',
+              label: '江门市'
+            },
+
+            {
+              value: '广州市',
+              label: '广州市'
+            },
+
+            {
+              value: '中山市',
+              label: '中山市'
+            }
+          ]
+        },
+        {
+          value: '陕西省',
+          label: '陕西省',
+          children: [
+            {
+              value: '宝鸡市',
+              label: '宝鸡市'
+            },
+            {
+              value: '西安市',
+              label: '西安市'
+            },
+
+            {
+              value: '咸阳市',
+              label: '咸阳市'
+            },
+
+            {
+              value: '攀枝花市',
+              label: '攀枝花市'
+            },
+
+            {
+              value: '铜川市',
+              label: '铜川市'
+            },,
+
+            {
+              value: '渭南市',
+              label: '渭南市'
+            },
+            {
+              value: '延安市',
+              label: '延安市'
+            },
+            {
+              value: '榆林市',
+              label: '榆林市'
+            },
+            {
+              value: '安康市',
+              label: '安康市'
+            },
+            {
+              value: '商洛市',
+              label: '商洛市'
+            }
+          ]
+        }
+      ],
+      selectedOptions: [],
+      selectedOptions2: [],
+      selecttext: ''
+    }
+  },
+  methods: {
+    handleChange (label) {
+      this.selecttext = label.toString()
+      this.$emit('selsectedText', this.selecttext)
+    }
+  }
+}
+</script>
+
+<style scoped>
+#ulcour {
+  list-style: none;
+}
+#courierText {
+  width: 300px;
+  height: 40px;
+  outline: none;
+  border: 1px solid gray;
+}
+.courierdiv {
+  margin-top: 0px;
+}
+</style>

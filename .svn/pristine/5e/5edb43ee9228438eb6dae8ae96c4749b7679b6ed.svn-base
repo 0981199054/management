@@ -1,0 +1,267 @@
+<template>
+  <div>
+    <div class="title">
+      <div class='del'>
+        <el-button type='primary' @click="affirm">确定</el-button>
+        <el-button type="primary" @click="del">删除</el-button>
+      </div>
+      <div class='select'>
+        <el-select v-model="value" @change="inputChange" placeholder="请选择">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+      </div>
+      <div>
+        <el-input v-model="inputValue" />
+      </div>
+      <div>
+        <el-button type="primary" icon="el-icon-search" @click="search"></el-button>
+        <el-button type="primary" @click="back">返回</el-button>
+      </div>
+    </div>
+    <div>
+      <el-table height="700px" :data="data" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column align='center' type="selection" width="55">
+        </el-table-column>
+        <el-table-column align='center' prop="name" label="店铺名称" width="200">
+        </el-table-column>
+        <el-table-column align='center' prop="site" label="店铺地址" width="200">
+        </el-table-column>
+        <el-table-column align='center' prop="phone" label="联系方式" width="120">
+        </el-table-column>
+        <el-table-column align='center' prop="type" label="经营范围" width="120">
+        </el-table-column>
+      </el-table>
+      <el-pagination :current-page="page" layout="prev, pager, next" @current-change='change' :total="this.total">
+      </el-pagination>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+let ip = 'http://127.0.0.1:3333/permission'
+export default {
+  data () {
+    return {
+      data: [],
+      multipleSelection: [],
+      rows: 10,
+      page: 1,
+      total: 1,
+      centerDialogVisible: false,
+      inputValue: '',
+      options: [
+        {
+          value: 'name',
+          label: '店铺名称'
+        },
+        {
+          value: 'site',
+          label: '店铺地址'
+        },
+        {
+          value: 'phone',
+          label: '联系方式'
+        },
+        {
+          value: 'type',
+          label: '经营范围'
+        }
+      ],
+      value: ''
+    }
+  },
+  created () {
+    axios.post(ip + '/nop', { page: this.page, rows: this.rows }).then(msg => {
+      this.data = msg.data.rows
+      this.total = msg.data.total
+    })
+  },
+  methods: {
+    toggleSelection (rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row)
+        })
+      } else {
+        this.$refs.multipleTable.clearSelection()
+      }
+    },
+    handleSelectionChange (val) {
+      if (val.length !== 0) {
+        this.multipleSelection = val
+      } else {
+        this.multipleSelection = []
+      }
+    },
+    // -------------------------删除功能-----------------------//
+    // 删除数据
+    del () {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          type: 'error',
+          message: '请选择需要删除的数据'
+        })
+      } else {
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          cancelButtonText: '取消',
+          confirmButtonText: '确定',
+          type: 'warning'
+        })
+          .then(() => {
+            axios
+              .post(ip + '/delnop', {
+                ids: this.multipleSelection.map(item => item._id)
+              })
+              .then(msg => {
+                console.log(msg)
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                })
+                this.page = 1
+                axios
+                  .post(ip + '/nop', { page: this.page, rows: this.rows })
+                  .then(msg => {
+                    this.data = msg.data.rows
+                    this.total = msg.data.total
+                  })
+              })
+          })
+          .catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+      }
+    },
+    // 确认按钮
+    affirm () {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          type: 'error',
+          message: '请选择需要添加的商家'
+        })
+      } else {
+        this.multipleSelection.map(item => {
+          axios.post(ip + '/nopUp', {_id: item.id, storeAll: [item._id]}).then(msg => {
+            let param = []
+            this.multipleSelection.map(item => {
+              param.push(item._id)
+            })
+            this.multipleSelection.map(item => {
+              return (
+                delete item._id
+              )
+            })
+            axios.post(ip + '/delnop', {ids: param}).then(msg => {
+              this.page = 1
+              axios.post(ip + '/nop', { page: this.page, rows: this.rows }).then(msg => {
+                this.data = msg.data.rows
+                this.total = msg.data.total
+              })
+            })
+            axios.post(ip + '/addshop', {submitType: 'addMore', data: this.multipleSelection}).then(msg => {
+              this.$message({
+                type: 'success',
+                message: '添加成功!'
+              })
+            })
+          })
+        })
+      }
+    },
+    // 换页
+    change (val) {
+      this.page = val
+      if (this.options.value) {
+        let param = {}
+        param[this.options.value] = this.inputValue
+        axios
+          .post(ip + '/nop', { ...param, page: this.page, rows: this.rows })
+          .then(msg => {
+            this.data = msg.data.rows
+            this.total = msg.data.total
+          })
+      } else {
+        axios
+          .post(ip + '/nop', { page: this.page, rows: this.rows })
+          .then(msg => {
+            this.data = msg.data.rows
+            this.total = msg.data.total
+          })
+      }
+    },
+    // ---------------------查询功能--------------------//
+    // 选项输入
+    inputChange (val) {
+      this.options.value = val
+    },
+    // 搜索按钮
+    search () {
+      if (this.options.value) {
+        let param = {}
+        param[this.options.value] = this.inputValue
+        this.page = 1
+        axios
+          .post(ip + '/nop', { ...param, page: this.page, rows: this.rows })
+          .then(msg => {
+            this.data = msg.data.rows
+            this.total = msg.data.total
+          })
+      } else {
+        this.$message({
+          type: 'error',
+          message: '请选择查询类型'
+        })
+      }
+    },
+    // 返回
+    back () {
+      this.page = 1
+      this.inputValue = ''
+      axios
+        .post(ip + '/nop', { page: this.page, rows: this.rows })
+        .then(msg => {
+          this.data = msg.data.rows
+          this.total = msg.data.total
+        })
+    }
+  }
+}
+</script>
+
+<style scoped >
+.amend {
+  width: 80%;
+  margin-top: 10px;
+}
+.title {
+  display: flex;
+}
+.select {
+  width: 120px;
+  margin-left: 10px;
+}
+.del {
+  margin-left: 10px;
+}
+.el-button--primary {
+background-color: #ff5777;
+border: none;
+}
+.el-pager li.active {
+color: #ff5777;
+}
+.el-pager li:hover{
+color: #ff5777;
+}
+.el-pagination button:hover{
+color: #ff5777;
+}
+.el-button--primary:hover{
+background-color: #ff5777;
+}
+</style>

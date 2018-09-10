@@ -1,0 +1,33 @@
+<template>
+    
+    <div>
+        <input id="inputText" type="text"><button @click="clicvlbutton">点我测试</button>
+        <ul id="ultext">
+        </ul>
+    </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      text: []
+    };
+  },
+  methods: {
+    clicvlbutton() {
+      if (inputText.value === "") {
+        this.$notify({
+          title: "警告",
+          message: "数据不能为空",
+          type: "warning"
+        });
+      }else{
+      console.log(inputText.value);
+      this.text.push(inputText.value);
+      inputText.value = "";
+      }
+    }
+  }
+};
+</script>

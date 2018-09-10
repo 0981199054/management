@@ -1,0 +1,160 @@
+<template>
+  <div>
+  <el-table
+    ref="multipleTable"
+    :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+    tooltip-effect="dark"
+    style="width: 100%"
+    height= "550px"
+    @selection-change="handleSelectionChange">
+    <el-table-column
+      type="selection"
+      width="55">
+    </el-table-column>
+    <el-table-column
+      fixed
+      prop="commodity_name"
+      label="商品名称"
+      width="200"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="commodity_img"
+      label="商品图片 "
+      width="120"
+      align="center">
+      <template slot-scope="scope">
+        <div class="box">
+          <img :src="ip+/tbimg/+scope.row.commodity_img[0]"  class="head_pic"/>
+          <!-- <img v-for="(item,index) in scope.row.commodity_img" :key="index" :src="ip+/tbimg/+item"  class="head_pic"/> -->
+        </div>
+　　  </template>
+    </el-table-column>
+    <el-table-column
+      prop="promotion"
+      label="促销价格"
+      width="145"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="price"
+      label="商品价格"
+      width="77"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="expressage"
+      label="商品快递"
+      width="120"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="Money_Off.full"
+      label="优惠条件"
+      width="77"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="Money_Off.decrease"
+      label="优惠内容"
+      width="77"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="specification"
+      label="商品规格"
+      width="200"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      prop="stock"
+      label="商品库存"
+      width="77"
+      align="center">
+    </el-table-column>
+    <el-table-column
+      fixed="right"
+      label="操作"
+      width="180"
+      align="center">
+      <template slot-scope="scope">
+        <el-row>
+          <el-button type="primary" @click="upd_data">修改</el-button>
+          <el-button type="primary" @click="del_data">删除</el-button>
+        </el-row>
+      </template>
+    </el-table-column>
+  </el-table>
+  <el-pagination
+   small
+    layout="prev, pager, next"
+    :total="total" 
+    @current-change="current_change">
+  </el-pagination>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      ip: "http://192.168.43.169:5555",
+      IP: "http://172.20.10.3:5555",
+      tableData: [],
+      multipleSelection: [],
+      total: 0,
+      pagesize: 10,
+      currentPage: 1
+    };
+  },
+
+  methods: {
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    upd_data() {
+      if (this.multipleSelection.length === 0) {
+        this.$alert("请选择需要修改的数据", "提示信息", {
+          confirmButtonText: "确定"
+        });
+      }
+    },
+    del_data() {
+      if (this.multipleSelection.length === 0) {
+        this.$alert("请选择需要删除的数据", "提示信息", {
+          confirmButtonText: "确定"
+        });
+      }
+    },
+    current_change: function(currentPage) {
+      this.currentPage = currentPage;
+    }
+  },
+  created() {
+    axios.get(this.ip + "/retailers_getdata", { params: {} }).then(msg => {
+      this.tableData = msg.data;
+      this.total = msg.data.length;
+    });
+  }
+};
+</script>
+<style scoped>
+.head_pic {
+  width: 100px;
+  height: 100px;
+  float: left;
+}
+.box {
+  width: 101px;
+}
+</style>

@@ -1,0 +1,16 @@
+import Vue from 'vue'
+import Vuex from 'vuex'
+import module1 from './module1'
+import module2 from './module2'
+import TBShop from './tbShop'
+
+Vue.use(Vuex)
+const store = new Vuex.Store({
+  modules: {
+    module1,
+    module2,
+    TBShop
+  }
+})
+
+export default store

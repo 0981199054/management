@@ -1,0 +1,11 @@
+let login = {
+  state: {
+    list: {}
+  },
+  mutations: {
+    changeList (state, params) {
+      state.list = params
+    }
+  }
+}
+export default login

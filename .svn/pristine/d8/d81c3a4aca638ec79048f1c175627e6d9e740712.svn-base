@@ -1,0 +1,371 @@
+<template>
+  <div class="parentDiv">
+    <!-- 内容上部分 -->
+    <div class="contentDiv">
+      <div>
+        <label>店铺名称：</label> <input id="store_name" name="store_name" class="content_input" placeholder="请输入内容"></div>
+      <div>
+        <label>商品名称：</label> <input id="commodity_name" name="commodity_name" class="content_input" placeholder="请输入内容"></div>
+
+      <div>
+        <label>价格：</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="price" name="price" class="content_input" placeholder="请输入内容"></div>
+      <div>
+        <label>促销价格：</label> <input id="promotion" name="promotion" class="content_input" placeholder="请输入内容"></div>
+      <div>
+        <label>销量：</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="sales" name="sales" class="content_input" placeholder="请输入内容"></div>
+      <div style="display:flex">
+        <label style="fontWeight:900;">商品上市时间：</label>
+        <GetTime style="marginTop:-5px" @GetTime="getTime" />
+      </div>
+
+      <div>
+        <label>库存：</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="stock" name="stock" class="content_input" placeholder="请输入内容"></div>
+
+      <div>
+        <label>评分:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="grade" name="grade" class="content_input" placeholder="请输入内容"></div>
+
+      <div><input type="hidden" id="grade" name="grade" class="content_input" placeholder="请输入内容"></div>
+    </div>
+
+    <!-- 内容字段图片部分 -->
+    <!-- 组件传值 -->
+
+    <div style="display:flex">
+      <label style="fontWeight:900">地理位置： </label>
+      <Postioncity @selsectedText="getPostioncity" />
+    </div>
+
+    <div class="sonzujian">
+      <label style="fontWeight:900;">产品参数：</label>
+      <parameters @childValue="getVal" />
+      <span style="fontSize:13px;color:gray;marginLeft:10px">(请手动输入该商品的参数信息;输入信息会在下方展示)</span>
+    </div>
+
+    <div class="standard" style="marginTop:30px">
+      <label style="fontWeight:900">规格：</label>
+      <!-- 规格内容组件 -->
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <Standard @Standard="getStandard" />
+
+    </div>
+
+    <div class="severdiv" style="marginTop:30px">
+      <label style="fontWeight:900;">服务：</label>
+      <el-checkbox :indeterminate="issever" v-model="severAll" @change="severCheckAllChange">全选</el-checkbox>
+      <div style="margin: 5px 0;"></div>
+      <el-checkbox-group v-model="checkedsever" @change="handleCheckedseverChange">
+        <el-checkbox style="color:red;marginTop:10px;fontSize:10px" v-for="serve in severarr" :label="serve" :key="serve">{{ serve}}</el-checkbox><br>
+      </el-checkbox-group>
+    </div>
+
+    <!-- 详情 -->
+    <div class="xiang_option">
+      <label style="fontWeight:900">详情：</label>
+      <parTiculars @parTiculars="getparTicu" />
+    </div>
+
+    <!-- 快递公司 -->
+    <div class="courier"> 快递公司：
+      <Courier @childCourier="Courier" />
+    </div>
+
+    <!-- 商品图片 -->
+    <div class="shop_img">
+      <label style="fontWeight:900">商品图片：</label>
+      <UploadImg @uploadImgarr="getUploadimg" />
+    </div>
+
+    <!-- <button >点我上传商品信息</button> -->
+    <el-button class="uploadBtn" @click="clickbtn" type="primary" plain>点击上传商品信息</el-button>
+
+    <footer class="footer">
+      网络文化经营许可证：浙网文[2016]0268-027号|增值电信业务经营许可证：浙B2-20080224|信息网络传播视听许可证：1109364号|互联网违法和不良信息举报电话：0571-81683755 blxxjb@alibaba-inc.com
+    </footer>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+// 引入组件
+import parameters from './Parameter'
+import Courier from './Courier.vue'
+import UploadImg from './UploadImg.vue'
+import parTiculars from './Particulars.vue'
+import Postioncity from './Postioncity.vue'
+import GetTime from './GetTime.vue'
+import Standard from './Standard.vue'
+
+// 服务
+const severOptions = [
+  '8天退货退货条件：在商品签收8天内，商品包装完好、吊牌齐全、未洗涤，可提出退货申请。邮费说明：包邮商品发货邮费卖家承担；非包邮商品发货邮费卖家承担；退货邮费买家承担。',
+  '消费者保障服务该卖家已缴纳 1211.0 元保证金。在确认收货 15 天内，如有商品质量问题、描述不符或未收到货等，您有权申请退款或退货，来回邮费由卖家承担。',
+  '退货条件：在商品签收15天内，商品包装完好、吊牌齐全、未洗涤，可提出退货申请。邮费说明：包邮商品发货邮费卖家承担；非包邮商品发货邮费卖家承担；退货邮费卖家承担。',
+  '保证2个工作日之内发货'
+]
+// 规格
+const cityOptions = [
+  'S【胸围80腰68】',
+  'M【胸围84腰72】',
+  'L【胸围88腰76】',
+  'XL【胸围94腰82】'
+]
+export default {
+  data () {
+    return {
+      ip: 'http://127.0.0.1:3333',
+      // 多选服务
+      severAll: false,
+      checkedsever: [],
+      severarr: severOptions,
+      issever: true,
+      // 参数
+      text: [],
+      // 快递
+      couriertext: '',
+      // 商品图片
+      imgarr: [],
+      // 详情
+      detailsObj: {},
+      // 城市
+      citys: '',
+      // 时间
+      markettime: '',
+      // 规格
+      specistand: []
+
+      // 背景图片
+    }
+  },
+  // 注册组件
+  components: {
+    parameters,
+    Courier,
+    UploadImg,
+    parTiculars,
+    Postioncity,
+    GetTime,
+    Standard
+  },
+  methods: {
+    // 参数组件传值
+    getVal (textext) {
+      this.text = textext
+    },
+    // 快递组件传值
+    Courier (courText) {
+      this.couriertext = courText
+    },
+    // 商品图片
+    getUploadimg (getimg) {
+      this.imgarr = getimg
+    },
+    // 详情
+    getparTicu (getTicu) {
+      this.detailsObj = getTicu
+    },
+    // 城市
+    getPostioncity (citytext) {
+      this.citys = citytext
+    },
+    // 获取时间
+    getTime (getime) {
+      this.markettime = getime
+    },
+    // 获取规格组件
+    getStandard (getStand) {
+      this.specistand = getStand
+    },
+
+    clickbtn () {
+      let param = {
+        store_name: store_name.value,
+        commodity_name: commodity_name.value,
+        // 商品图片
+        commodity_img: this.imgarr,
+        price: price.value,
+        promotion: promotion.value,
+        sales: sales.value,
+        // 时间
+        market: this.markettime,
+        // 快递
+        expressage: this.couriertext,
+        // 服务
+        serve: this.checkedsever,
+        stock: stock.value,
+        // 规格
+        specification: this.specistand,
+        // 参数
+        parameter: this.text,
+        grade: grade.value,
+        // 详情
+        details: this.detailsObj,
+        // 城市
+        city: this.citys
+      }
+
+      if (
+        store_name.value !== '' &&
+        commodity_name.value !== '' &&
+        price.value !== ''
+      ) {
+        // axios.get(this.ip +"/addcommdotiy",{params:{param}})
+        axios.post(this.ip + '/commod/addcommdotiy', param).then(msg => {
+          this.$notify({
+            title: '成功',
+            message: '添加成功',
+            type: 'success'
+          })
+        })
+      } else {
+        this.$message({
+          message: '系统提示！内容不能为空',
+          type: 'warning'
+        })
+      }
+    },
+    // 多选参数
+    severCheckAllChange (val) {
+      this.checkedsever = val ? severOptions : []
+      this.issever = false
+    },
+    handleCheckedseverChange (value) {
+      let checkedCount = value.length
+      this.severAll = checkedCount === this.severarr.length
+      this.issever = checkedCount > 0 && checkedCount < this.severarr.length
+    }
+  }
+}
+</script>
+<style>
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.parentDiv[data-v-32188b8c] {
+  height: 100%;
+  padding: 0 30px 30px 30px;
+  margin-top: 0px;
+}
+.parentDiv {
+  height: 100%;
+  padding: 0 30px 30px 30px;
+}
+.input_div {
+  text-align: center;
+  width: 100%;
+  height: 100px;
+  border-bottom: 3px solid rgb(20, 85, 3);
+}
+.input_div_img {
+  width: 110px;
+  height: 85px;
+  position: absolute;
+  left: 10%;
+}
+.div_span {
+  color: gray;
+  opacity: 0.5;
+}
+.Top_input {
+  padding-right: 30px;
+  height: 90%;
+  width: 80%;
+  border: none;
+  outline: none;
+}
+.contentDiv {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+.contentDiv div {
+  width: 30%;
+  margin-top: 20px;
+}
+.content_input {
+  height: 30px;
+  outline: none;
+}
+.sonzujian {
+  display: flex;
+  margin-top: 30px;
+}
+
+.uploadBtn {
+  height: 50px;
+  width: 150px;
+  margin-top: 20px;
+  margin-left: 40%;
+  outline: none;
+  color: aliceblue;
+  font-weight: bold;
+  background: rgb(149, 189, 206);
+  border: rgb(149, 189, 206);
+}
+.xiang_option {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  display: flex;
+}
+.shop_img {
+  margin-top: 30px;
+  display: flex;
+}
+.standard {
+  display: flex;
+}
+.courier {
+  display: flex;
+  font-weight: 900;
+}
+.el-checkbox,
+.el-checkbox__input {
+  display: inline-block;
+  position: relative;
+  white-space: pre-wrap;
+}
+.el-checkbox {
+  margin-left: 32px;
+}
+.bunSucces {
+  padding: 15px;
+}
+.biaoti {
+  font: 30 40px "Comic Sans MS";
+  color: white;
+  text-shadow: 0 0 20px #1d1d1b, 10px -10px 30px #ffae35,
+    10px -40px 70px #451b0e;
+}
+.footer {
+  border-top: 0.5px solid rgb(185, 182, 182);
+  margin-top: 50px;
+  text-align: center;
+  color: gray;
+  font-size: 13px;
+  width: 100%;
+  height: 70px;
+  line-height: 70px;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  background-color: #ff5777;
+  border-color: #ff5777;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  background-color: #ff5777;
+  border-color: #ff5777;
+}
+.el-checkbox__inner:hover {
+  border-color: #ff5777;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #ff5777;
+}
+.el-checkbox__input.is-focus .el-checkbox__inner {
+  border-color: #ff5777;
+}
+</style>

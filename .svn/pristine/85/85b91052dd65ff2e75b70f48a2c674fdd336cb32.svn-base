@@ -1,0 +1,59 @@
+<template>
+
+    <div  class="courierdiv">
+        <input placeholder="请输入快递公司" id="courierText" type="text">
+        <el-button style="marginLeft:10px" type="primary" plain @click="courierbutton">确定</el-button>
+        <ul id="ulcour">
+           <li>{{this.courtext}}</li>
+        </ul>
+    </div>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      courtext: ''
+    }
+  },
+  methods: {
+    courierbutton () {
+      if (courierText.value === '') {
+        this.$message({
+          message: '系统提示！内容不能为空',
+          type: 'warning'
+        })
+      } else {
+        this.courtext = courierText.value
+        courierText.value = ''
+        this.$emit('childCourier', this.courtext)
+      }
+    }
+  }
+}
+</script>
+
+<style>
+#ulcour {
+  list-style: none;
+}
+#courierText {
+  width: 300px;
+  height: 40px;
+  outline: none;
+  border: 1px solid gray;
+}
+#ulcour li {
+  font-size: 12px;
+  color: gray;
+}
+.el-button--primary.is-plain{
+  color: wheat;
+  background-color: #ff5777;
+  border-color: #ff5777;
+}
+.el-button--primary.is-plain:hover{
+  background-color: #ff5777;
+  border-color: #ff5777;
+}
+</style>

@@ -1,0 +1,82 @@
+<template>
+    <div class="particborder">
+        <div>
+            <el-upload
+                class="upload-demo"
+                :action="ips"
+                :limit="20"
+                name="inputFile"
+                :on-success = "fileSuccess"
+                multiple
+                >
+                <el-button size="small" type="primary">点击上传图片</el-button>
+                <span  style="marginLeft:10px" slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb(注意上传之后不可修改)</span>
+            </el-upload>
+        </div>
+        <div style="marginTop:10px;marginLeft:20px">
+            <input type="text" placeholder="输入详情的字段" id="particulinput"><el-button type="primary" plain style="marginLeft:10px" @click="particuBtn">确定</el-button>
+            <ul id="ulcour" v-for="(obj,index) in details.contentarr" :key="index">
+                <li><span style="color:#2a27278f;fontSize:15px">{{index+1}}:</span>({{obj}})</li>
+            </ul>
+        </div>
+    </div>
+</template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      ips: "http://192.168.43.13:4444/commod/uploader",
+      imageUrl: "",
+      details: {
+        imgarr: [],
+        contentarr: []
+      }
+    };
+  },
+
+  methods: {
+    particuBtn() {
+      if (particulinput.value === "") {
+        this.$notify({
+          title: "警告",
+          message: "数据不能为空",
+          type: "warning"
+        });
+      } else {
+        this.details.contentarr.push(particulinput.value);
+        particulinput.value = "";
+      }
+    },
+    fileSuccess(response, file, fileList) {
+      this.inputFile = response;
+      this.details.imgarr.push(file.name);
+      this.$emit("parTiculars", this.details);
+    }
+  }
+};
+</script>
+
+<style scoped>
+#ulcour {
+  list-style: none;
+}
+#ulcour li {
+  font-size: 12px;
+  color: gray;
+}
+#particulinput {
+  width: 300px;
+  height: 40px;
+  outline: none;
+  border: 1px solid gray;
+}
+.particborder {
+  display: flex;
+}
+.el-button--primary {
+  background-color: #ff5777;
+  border-color: #ff5777;
+}
+</style>

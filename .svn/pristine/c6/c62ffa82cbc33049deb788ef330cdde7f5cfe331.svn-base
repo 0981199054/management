@@ -1,0 +1,220 @@
+<template>
+    <div>
+       <el-button type="primary" @click="decBtn">删除</el-button>
+       <el-select  @change="search"  v-model="value" placeholder="请选择查询类型">
+       <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+      </el-select>
+      <el-input v-model="val" placeholder="请输入查询的内容" prefix-icon="el-icon-search" style="width:250px;"></el-input>
+      <el-button @click="searchBtn" type="primary"  icon="el-icon-search"></el-button>
+      <el-button @click="clearBtn" type="primary"  >清空查询</el-button>
+            <el-table ref="multipleTable" :data="tableData3" tooltip-effect="dark" style="width: 100%;" height='600px' @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="55"></el-table-column>
+            <el-table-column label="商品名称" width="300" prop="name"></el-table-column>
+            <el-table-column label="商品图片" width="150" prop="img">
+              <template slot-scope="scope">
+                  <img class="img" :src="ip+/taobaoimg/+scope.row.img" alt="">
+              </template>
+            </el-table-column>
+            <el-table-column prop="_id" label="商品单号" width="150"></el-table-column>
+            <el-table-column prop="money" label="商品价格" width="150"></el-table-column>
+            <el-table-column prop="size" label="商品尺寸" width="150"></el-table-column>
+            <el-table-column prop="freight" label="商品运费" width="150"></el-table-column>
+            <el-table-column prop="isfufei" label="商品状态" width="150"></el-table-column>
+            <el-table-column prop="kuaidi" label="快递公司" width="150"></el-table-column>
+            <el-table-column label="操作" show-overflow-tooltip>
+              <template slot-scope="scope">
+                  <el-button type="primary" @click="updateBtn">修改</el-button>
+                    <el-dialog v-if="multipleSelection.length>0" title="修改" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+                      商品名称：<el-input v-model="multipleSelection[0].name" style="width:250px;" ></el-input><br>
+                      商品图片：<el-input v-model="multipleSelection[0].img" style="width:250px;"></el-input><br>
+                      商品单号：<el-input v-model="multipleSelection[0]._id" style="width:250px;"></el-input><br>
+                      商品价格：<el-input v-model="multipleSelection[0].money" style="width:250px;"></el-input><br>
+                      商品尺寸：<el-input v-model="multipleSelection[0].size" style="width:250px;"></el-input><br>
+                      商品运费：<el-input v-model="multipleSelection[0].yunfei" style="width:250px;"></el-input><br>
+                      商品状态：<el-input v-model="multipleSelection[0].isfufei" style="width:250px;"></el-input><br>
+                      快递公司：<el-input v-model="multipleSelection[0].kuaidi" style="width:250px;"></el-input><br>
+                        <span slot="footer" class="dialog-footer">
+                        <el-button @click="dialogVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="isok">确 定</el-button>
+                      </span>
+                    </el-dialog>
+              </template>
+            </el-table-column>
+        </el-table>
+       <el-pagination layout="prev, pager, next" @current-change="change" :total="this.total"></el-pagination>
+    </div>
+    
+</template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      IP: "http://192.168.43.202:4444/taobao",
+      tableData3: [],
+      ip: "http://192.168.43.202:4444",
+      multipleSelection: [],
+      total: 1,
+      currentPage: 1,
+      pagesize: 10,
+      dialogVisible: false,
+      input: "",
+      val: "",
+      options: [
+        {
+          value: "_id",
+          label: "商品单号"
+        },
+        {
+          value: "isfufei",
+          label: "商品状态"
+        },
+        {
+          value: "kuaidi",
+          label: "快递公司"
+        }
+      ],
+      value: ""
+    };
+  },
+  created() {
+    axios
+      .post(this.IP + "/dingdan", {
+        page: this.currentPage,
+        rows: this.pagesize
+      })
+      .then(msg => {
+        this.total = msg.data.total;
+        this.tableData3 = msg.data.rows;
+      });
+  },
+  methods: {
+    //---------------------------------- 删除 ------------------------------//
+    decBtn() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          message: "警告,删除数据不能为空",
+          type: "error"
+        });
+      } else {
+        this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            axios
+              .post(this.IP + "/dingdandel", {
+                ids: this.multipleSelection.map(item => item._id)
+              })
+              .then(msg => {
+                this.$message({
+                  type: "success",
+                  message: "删除成功!"
+                });
+                axios
+                  .post(this.IP + "/dingdan", {
+                    page: this.currentPage,
+                    rows: this.pagesize
+                  })
+                  .then(msg => {
+                    this.tableData3 = msg.data.rows.map(item => {
+                      return item;
+                    });
+                  });
+              });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消删除"
+            });
+          });
+      }
+    },
+    handleSelectionChange(val) {
+      if (val.length !== 0) {
+        this.multipleSelection = val;
+      } else {
+        this.multipleSelection = [];
+      }
+    },
+    //---------------------------------- 翻页 ------------------------------//
+    change: function(val) {
+      this.currentPage = val;
+      axios
+        .post(this.IP + "/dingdan", {
+          page: this.currentPage,
+          rows: this.pagesize
+        })
+        .then(msg => {
+          this.totals = msg.data.total;
+          this.tableData3 = msg.data.rows;
+        });
+    },
+    handleClose(done) {
+      done();
+    },
+    //---------------------------------- 修改 ------------------------------//
+    updateBtn() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          message: "警告,修改数据不能为空",
+          type: "error"
+        });
+      } else {
+        this.dialogVisible = true;
+      }
+    },
+    isok() {
+      let pram = { ...this.multipleSelection[0] };
+      axios.post(this.IP + "/dingdanupdate", pram).then(msg => {
+        this.dialogVisible = false;
+      });
+    },
+    //---------------------------------- 查询 ------------------------------//
+    search(val) {
+      this.options.value = val;
+    },
+    //搜索按钮
+    searchBtn() {
+      if (this.options.value) {
+        let pram = {};
+        pram[this.options.value] = this.val;
+        this.currentPage = 1;
+        axios
+          .post(this.IP + "/dingdan", {
+            ...pram,
+            page: this.currentPage,
+            rows: this.pagesize
+          })
+          .then(msg => {
+            this.tableData3 = msg.data.rows;
+            this.total = msg.data.total;
+            console.log(msg.data.rows);
+          });
+      }
+    },
+    //清空查询
+    clearBtn() {
+      this.val = "";
+      axios
+        .post(this.IP + "/dingdan", {
+          page: this.currentPage,
+          rows: this.pagesize
+        })
+        .then(msg => {
+          this.total = msg.data.total;
+          this.tableData3 = msg.data.rows;
+        });
+    }
+  }
+};
+</script>
+<style scoped>
+.img {
+  width: 100px;
+  height: 100px;
+}
+</style>

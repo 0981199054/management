@@ -1,0 +1,66 @@
+<template>
+  <div>
+    <el-tabs @tab-click="handleClick">
+      <el-tab-pane class="tab" label="用户管理" value='information' name="first"></el-tab-pane>
+      <el-tab-pane class="tab" label="配置管理" value='news' name="second"></el-tab-pane>
+      <el-tab-pane class="tab" label="角色管理" value='nopass' name="third"></el-tab-pane>
+    </el-tabs>
+    <!-- <div>
+      <div @click='goInformation'>店铺信息</div>
+      <div @click='goNopass'>店铺申请</div>
+      <div @click='goNews'>消息推送</div>
+    </div> -->
+    <router-view />
+  </div>
+</template>
+
+<script>
+// let ip = 'http://192.168.43.136:3333/images/'
+export default {
+  name: 'Permission',
+  data () {
+    return {
+      mark: 0,
+      timer: null,
+      imgMain: '../static/imgarr/main.jpg',
+      imgArray: [
+        '../static/imgarr/1.jpg',
+        '../static/imgarr/2.jpg',
+        '../static/imgarr/3.jpg'
+      ]
+    }
+  },
+  methods: {
+    handleClick (tab, event) {
+      this.$router.push(`/${tab.$attrs.value}`)
+    }
+  },
+  components: {},
+  computed: {
+    // logImg () {
+    //   return ip + this.$store.state.JDShop.userImg
+    // },
+    // islog () {
+    //   return this.$store.state.JDShop.islog
+    // }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-tabs__item {
+  font-size: 20px;
+}
+.el-tabs__item.is-active {
+  color: #ff0000;
+  border: #ff0000;
+}
+.el-tabs__item:hover {
+  color: #ff0000;
+}
+.el-tabs__active-bar {
+  background-color: #ff0000;
+  height: 3px;
+}
+</style>

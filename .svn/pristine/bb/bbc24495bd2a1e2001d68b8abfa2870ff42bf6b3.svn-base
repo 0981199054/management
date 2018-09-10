@@ -1,0 +1,72 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+// import HelloWorld from '@/components/HelloWorld'
+import Main from '@/components/Main'
+import Log from '@/components/Log'
+import Reg from '@/components/Reg'
+//----------------------- 主页 ---------------------//
+import Store from '../components/Management/Store'
+//----------------------- 店铺管理 ---------------------//
+import Shop from '../components/module/Shop'
+//----------------------- 商品管理 ---------------------//
+import Commodity from '../components/module/Commodity'
+//----------------------- 推送管理 ---------------------//
+import Push from '../components/module/Push'
+//----------------------- 订单管理 ---------------------//
+import Order from '../components/module/Order'
+
+import Permission from '../components/Management/Permission'
+Vue.use(Router)
+
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'Main',
+      component: Main
+
+    },
+    {
+      path: '/log',
+      name: 'Log',
+      component: Log
+    },
+    {
+      path: '/reg',
+      name: 'Reg',
+      component: Reg
+    },
+    {
+      path: '/Store',
+      name: 'Store',
+      component: Store,
+      children: [
+        {
+          path: '/shop',
+          name: 'shop',
+          component: Shop
+        },
+        {
+          path: '/Commodity',
+          name: 'Commodity',
+          component: Commodity
+        },
+        {
+          path: '/Push',
+          name: 'Push',
+          component: Push
+        },
+        {
+          path: '/Order',
+          name: 'Order',
+          component: Order
+        }
+      ]
+    },
+    {
+      path: '/Permission',
+      name: 'Permission',
+      component: Permission
+    }
+  ]
+})

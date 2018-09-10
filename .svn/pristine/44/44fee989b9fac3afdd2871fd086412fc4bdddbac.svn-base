@@ -1,0 +1,164 @@
+<template>
+    <div>
+                <el-table
+            ref="multipleTable"
+            :data="tableData3"
+            tooltip-effect="dark"
+            style="width: 100%;"
+            height='600px'
+            @selection-change="handleSelectionChange"
+        >
+                <el-table-column
+            type="selection"
+            width="55">
+            </el-table-column>
+            <el-table-column
+            label="商品名称"
+            width="300"
+            prop="name"
+            >
+            </el-table-column>
+            <el-table-column
+            label="商品图片"
+            width="150"
+            prop="img"
+            >
+             <template slot-scope="scope">
+                 <img class="img" :src="ip+/taobaoimg/+scope.row.img" alt="">
+             </template>
+            </el-table-column>
+            <el-table-column
+            prop="money"
+            label="商品价格"
+            width="150">
+            </el-table-column>
+            <el-table-column
+            prop="size"
+            label="商品尺寸"
+            width="150">
+            </el-table-column>
+            <el-table-column
+            prop="yunfei"
+            label="商品运费"
+            width="150">
+            </el-table-column>
+            <el-table-column
+            prop="isfufei"
+            label="商品状态"
+            width="150">
+            </el-table-column>
+            <el-table-column
+            prop="kuaidi"
+            label="快递公司"
+            width="150"
+            >
+            </el-table-column>
+            <el-table-column
+            label="操作"
+            show-overflow-tooltip
+            >
+             <template slot-scope="scope">
+                 <el-button type="primary" @click="decBtn">删除</el-button>
+                <el-button type="primary">修改</el-button>
+             </template>
+            </el-table-column>
+        </el-table>
+       <el-pagination
+        layout="prev, pager, next"
+       @current-change="change"
+        :total="this.total">
+        </el-pagination>
+    </div>
+    
+</template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      IP: "http://192.168.43.202:4444/taobao",
+      tableData3: [],
+      ip: "http://192.168.43.202:4444",
+      multipleSelection: [],
+      total: 1,
+      currentPage: 1,
+      pagesize: 10
+    };
+  },
+  created() {
+    axios
+      .post(this.IP + "/dingdan", {
+        page: this.currentPage,
+        rows: this.pagesize
+      })
+      .then(msg => {
+        this.total = msg.data.total;
+        this.tableData3 = msg.data.rows;
+        console.log(this.total);
+      });
+  },
+  methods: {
+    decBtn() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          message: "警告,删除数据不能为空",
+          type: "error"
+        });
+      } else {
+        this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            axios
+              .post(this.IP + "/dingdandel", {
+                ids: this.multipleSelection.map(item => item._id)
+              })
+              .then(msg => {
+                this.$message({
+                  type: "success",
+                  message: "删除成功!"
+                });
+                axios
+                  .post(this.IP + "/dingdan", { page: 1, rows: 7 })
+                  .then(msg => {
+                    this.tableData3 = msg.data.rows.map(item => {
+                      return item;
+                    });
+                  });
+              });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消删除"
+            });
+          });
+      }
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    change: function(val) {
+      this.currentPage = val;
+      axios
+        .post(this.IP + "/dingdan", {
+          page: this.currentPage,
+          rows: this.pagesize
+        })
+        .then(msg => {
+          this.totals = msg.data.total;
+          this.tableData3 = msg.data.rows;
+        });
+    }
+  }
+};
+</script>
+<style scoped>
+.img {
+  width: 60px;
+  height: 60px;
+}
+</style>

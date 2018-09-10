@@ -1,0 +1,114 @@
+<template>
+  <div>
+    <el-table ref="multipleTable" height="700px" :data="data" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table-column align='center' type="selection" width="55">
+      </el-table-column>
+      <el-table-column align='center' prop="name" label="店铺名称" width="200">
+      </el-table-column>
+      <el-table-column align='center' prop="site" label="店铺地址" width="200">
+      </el-table-column>
+      <el-table-column align='center' prop="phone" label="联系方式" width="120">
+      </el-table-column>
+      <el-table-column align='center' prop="LV" label="店铺等级" width="120">
+      </el-table-column>
+      <el-table-column align='center' prop="type" label="经营范围" width="120">
+      </el-table-column>
+      <el-table-column align='center' prop="shop" label="店铺商品总数" width="120">
+      </el-table-column>
+      <el-table-column align='center' prop="indent" label="店铺订单总数" width="120">
+      </el-table-column>
+      <el-table-column align='center' prop="isApply" label="是否通过注册" width="120">
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="del">删除</el-button>
+          <el-button type='primary'>修改</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination layout="prev, pager, next" @current-change='change' :total="this.total">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+let ip = 'http://127.0.0.1:3333/permission'
+export default {
+  data () {
+    return {
+      data: [],
+      multipleSelection: [],
+      rows: 10,
+      page: 1,
+      total: 1
+    }
+  },
+  created () {
+    axios.post(ip + '/inf', { page: this.page, rows: this.rows }).then(msg => {
+      this.data = msg.data.rows
+      this.total = msg.data.total
+    })
+  },
+  methods: {
+    toggleSelection (rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row)
+        })
+      } else {
+        this.$refs.multipleTable.clearSelection()
+      }
+    },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
+    // 删除数据
+    del () {
+      console.log(this.multipleSelection)
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          type: 'error',
+          message: '请选择需要操作的数据'
+        })
+      } else {
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          cancelButtonText: '取消',
+          confirmButtonText: '确定',
+          type: 'warning'
+        }).then(() => {
+          axios.post(ip + '/delshop', {
+            ids: this.multipleSelection.map(item => item._id)
+          }).then(msg => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            axios.post(ip + '/inf', { page: 1, rows: 10 }).then(msg => {
+              this.data = msg.data.rows
+              this.total = msg.data.total
+            })
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      }
+    },
+    // 换页
+    change (val) {
+      this.page = val
+      axios.post(ip + '/inf', { page: this.page, rows: this.rows }).then(msg => {
+        this.data = msg.data.rows
+        this.total = msg.data.total
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
